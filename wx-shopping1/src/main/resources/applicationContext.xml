@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+	<!-- 扫描除控制器逻辑 -->
+	<context:component-scan
+		base-package="com.czq.shopping">
+		<context:exclude-filter type="annotation"
+			expression="org.springframework.web.servlet.mvc.Controller" />
+	</context:component-scan>
+	<!-- Spring配置文件，主要配置和业务逻辑有关 -->
+	<!-- ========================== 数据源，事务控制等 start========================== -->
+	<!-- 引入数据库配置文件 -->
+	<context:property-placeholder
+		location="classpath:dbconfig.properties" />
+	<bean id="pooledDataSource"
+		class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="jdbcUrl" value="${jdbc.jdbcUrl}"></property>
+		<property name="driverClass" value="${jdbc.driverClass}"></property>
+		<property name="user" value="${jdbc.user}"></property>
+		<property name="password" value="${jdbc.password}"></property>
+	</bean>
+	<!-- ========================== 数据源，事务控制等 end========================== -->
+	
+
+	<!-- ========================== 整合Mybatis-Plus start ========================== -->
+	<bean id="sqlSessionFactory"
+		class="com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean">
+		<property name="dataSource" ref="pooledDataSource" />
+		      <property name="plugins">
+            <array>
+                <!-- 分页插件配置 -->
+                <bean id="paginationInterceptor" class="com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor">
+                    <property name="dialectType" value="mysql"/>
+                </bean>
+            </array>
+        </property>
+
+	</bean>
+	<!-- 配置扫描器，将mybatisplus接口实现加入到ioc容器中 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.czq.shopping.dao" />
+	</bean>
+	<!-- ========================== 整合Mybatis-Plus end========================== -->
+
+	<!-- ==================== 事务控制的配置 - 它也可以保证数据的一致性 ,防止脏读，幻象读等 start ================ -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="pooledDataSource"></property>
+	</bean>
+	<aop:config>
+		<!-- 切入点的配置 -->
+		<aop:pointcut
+			expression="execution(* com.czq.shopping.service..*(..))"
+			id="txPoint" />
+		<!-- 配置事务增强 -->
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="txPoint" />
+	</aop:config>
+	<!-- 配置事务增强，事务如何切入 -->
+	<tx:advice id="txAdvice"
+		transaction-manager="transactionManager">
+		<tx:attributes>
+			<!-- 所有方法都是事务方法 -->
+			<tx:method name="*" />
+			<!-- 以get方法开始的所有方法 -->
+			<tx:method name="get*" read-only="true" />
+		</tx:attributes>
+	</tx:advice>
+	<!-- ==================== 事务控制的配置 - 它也可以保证数据的一致性 ,防止脏读，幻象读等 end================ -->
+	<!-- spring 配置文件核心（数据源，与MP整合，事务控制） -->
+	
+			
+</beans>
