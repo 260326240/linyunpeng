@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linyunpeng.dao.LinyunpengMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.linyunpeng.model.Linyunpeng">
+        <result column="crop_name" property="cropName" />
+        <result column="crop_price" property="cropPrice" />
+        <result column="crop_kucun" property="cropKucun" />
+        <result column="crop_yunfei" property="cropYunfei" />
+        <result column="crop_fahuodi" property="cropFahuodi" />
+        <result column="crop_username" property="cropUsername" />
+        <result column="crop_describe" property="cropDescribe" />
+        <result column="ima_add1" property="imaAdd1" />
+        <result column="ima_add2" property="imaAdd2" />
+        <result column="ima_add3" property="imaAdd3" />
+        <result column="ima_touxiang" property="imaTouxiang" />
+    </resultMap>
+
+</mapper>

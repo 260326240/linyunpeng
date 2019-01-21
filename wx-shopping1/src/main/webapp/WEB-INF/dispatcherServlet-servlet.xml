@@ -9,12 +9,18 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
 	<!--Spring MVC 的配置文件，包含网站跳转逻辑的配置和控制  -->
 	<!-- 扫描所有的业务逻辑组件 -->
-	<context:component-scan base-package="com.czq.shopping.controller" >
+	<context:component-scan base-package="com.linyunpeng.controller" >
 		<!-- 只扫描控制器 -->
 		<!-- use-default-filters="false"
 		<context:include-filter type="annotation" expression="org.springframework.web.servlet.mvc.Controller"/>
 		 -->
 	</context:component-scan>
+	
+	<!-- 解决跨域访问问题 -->
+     <mvc:cors>
+    	<mvc:mapping path="/**" />
+    </mvc:cors> 
+	
 	<!-- 配置视图解析器，方便页面返回 -->
 	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<property name="prefix" value="/WEB-INF/views"></property>
@@ -25,5 +31,10 @@
 	<mvc:default-servlet-handler/>
 	<!-- 能支持支持springmvc更高级的功能，JSR303校验，快速ajax请求。。映射动态请求 -->
 	<mvc:annotation-driven/>
+	
+	<bean id="multipartResolver"
+          class="org.springframework.web.multipart.commons.CommonsMultipartResolver"
+          p:maxUploadSize="10485760"
+          p:defaultEncoding="UTF-8" />
 
 </beans>
